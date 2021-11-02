@@ -1,4 +1,4 @@
-#define MYSQL_HOSTNAME		"localhost" // เน€เธเธฅเธตเนเธขเธเธเธทเนเธญ localhost
+#define MYSQL_HOSTNAME		"localhost" // เปลี่ยนชื่อ localhost
 #define MYSQL_USERNAME		"root" // user
-#define MYSQL_PASSWORD		"" // เธฃเธซเธฑเธช เธซเธฒเธเนเธกเนเธกเธตเนเธกเนเธ•เนเธญเธเนเธชเน
-#define MYSQL_DATABASE		"willbedie" // เธเธทเนเธญ Database
+#define MYSQL_PASSWORD		"" // รหัส หากไม่มีไม่ต้องใส่
+#define MYSQL_DATABASE		"willbedie" // ชื่อ Database

@@ -1,36 +1,36 @@
 new
-    MySQL:sql_handle, // เธ•เธฑเธงเนเธเธฃ
-    PlayerName[MAX_PLAYERS][30], // เน€เธฃเธฒเธเธฐเนเธเนเธเธทเนเธญเธเธตเนเน€เธเธทเนเธญเน€เธเนเธเธเธทเนเธญเธเธนเนเน€เธฅเนเธ
-    PlayerIP[MAX_PLAYERS][17] // เน€เธฃเธฒเธเธฐเนเธเนเธเนเธญเธกเธนเธฅเธเธตเนเน€เธเธทเนเธญเน€เธเนเธ IP Address เธเธญเธเธเธนเนเน€เธฅเนเธ
+    MySQL:sql_handle, // ตัวแปร
+    PlayerName[MAX_PLAYERS][30], // เราจะใช้ชื่อนี้เพื่อเก็บชื่อผู้เล่น
+    PlayerIP[MAX_PLAYERS][17] // เราจะใช้ข้อมูลนี้เพื่อเก็บ IP Address ของผู้เล่น
 ;
 
-native WP_Hash(buffer[], len, const str[]); // เธเธตเนเธเธทเธญเธเธฑเธเธเนเธเธฑเธ Whirlpool เธเธณเน€เธเนเธเธ•เนเธญเธเนเธเนเน€เธเธทเนเธญเน€เธเนเธเธฃเธซเธฑเธชเธเนเธฒเธ
+native WP_Hash(buffer[], len, const str[]); // นี่คือฟังก์ชัน Whirlpool จำเป็นต้องใช้เพื่อเก็บรหัสผ่าน
 
 Load_MYSQL()
 {
 	new MySQLOpt: option_id = mysql_init_options();
  
-	mysql_set_option(option_id, AUTO_RECONNECT, true); // เธกเธฑเธเธเธฐเน€เธเธทเนเธญเธกเธ•เนเธญเนเธซเธกเนเนเธ”เธขเธญเธฑเธ•เนเธเธกเธฑเธ•เธดเน€เธกเธทเนเธญเธเธฒเธ”เธเธฒเธฃเน€เธเธทเนเธญเธกเธ•เนเธญเธเธฑเธเน€เธเธดเธฃเนเธเน€เธงเธญเธฃเน mysql
+	mysql_set_option(option_id, AUTO_RECONNECT, true); // มันจะเชื่อมต่อใหม่โดยอัตโนมัติเมื่อขาดการเชื่อมต่อกับเซิร์ฟเวอร์ mysql
  
-	sql_handle = mysql_connect(MYSQL_HOSTNAME, MYSQL_USERNAME, MYSQL_PASSWORD, MYSQL_DATABASE, option_id); // AUTO_RECONNECT เธ–เธนเธเน€เธเธดเธ”เนเธเนเธเธฒเธเธชเธณเธซเธฃเธฑเธเธ•เธฑเธงเธเธฑเธ”เธเธฒเธฃเธเธฒเธฃเน€เธเธทเนเธญเธกเธ•เนเธญเธเธตเนเน€เธ—เนเธฒเธเธฑเนเธ
+	sql_handle = mysql_connect(MYSQL_HOSTNAME, MYSQL_USERNAME, MYSQL_PASSWORD, MYSQL_DATABASE, option_id); // AUTO_RECONNECT ถูกเปิดใช้งานสำหรับตัวจัดการการเชื่อมต่อนี้เท่านั้น
 	if (sql_handle == MYSQL_INVALID_HANDLE || mysql_errno(sql_handle) != 0)
 	{
-		print("MySQL connection failed. Server is shutting down."); // เธญเนเธฒเธเธ”เนเธฒเธเธฅเนเธฒเธ
-		SendRconCommand("exit"); // เธเธดเธ”เน€เธเธดเธฃเนเธเน€เธงเธญเธฃเนเธซเธฒเธเนเธกเนเธกเธตเธเธฒเธฃเน€เธเธทเนเธญเธกเธ•เนเธญ
+		print("MySQL connection failed. Server is shutting down."); // อ่านด้านล่าง
+		SendRconCommand("exit"); // ปิดเซิร์ฟเวอร์หากไม่มีการเชื่อมต่อ
 		return 1;
 	}
 
-	print("MySQL connection is successful."); // เธซเธฒเธเธเธฒเธฃเน€เธเธทเนเธญเธกเธ•เนเธญ MySQL เธชเธณเน€เธฃเนเธ เน€เธฃเธฒเธเธฐเธเธดเธกเธเนเธเธฒเธฃเธ”เธตเธเธฑเธ!
+	print("MySQL connection is successful."); // หากการเชื่อมต่อ MySQL สำเร็จ เราจะพิมพ์การดีบัก!
     return 1;
 }
 
 Checkid_Account(playerid)
 {
 	new query[140];
-	GetPlayerName(playerid, PlayerName[playerid], 30); // เธเธทเนเธญเธเธนเนเน€เธฅเนเธ
-	GetPlayerIp(playerid, PlayerIP[playerid], 16); // เธ—เธตเนเธญเธขเธนเน IP เธเธญเธเธเธนเนเน€เธฅเนเธ
+	GetPlayerName(playerid, PlayerName[playerid], 30); // ชื่อผู้เล่น
+	GetPlayerIp(playerid, PlayerIP[playerid], 16); // ที่อยู่ IP ของผู้เล่น
  
-	mysql_format(sql_handle, query, sizeof(query), "SELECT `Password`, `ID` FROM `users` WHERE `Username` = '%e' LIMIT 0, 1", PlayerName[playerid]); // เธฃเธซเธฑเธชเธเนเธฒเธเนเธฅเธฐ ID เธเธฒเธเธเธทเนเธญเธเธนเนเน€เธฅเนเธ
+	mysql_format(sql_handle, query, sizeof(query), "SELECT `Password`, `ID` FROM `users` WHERE `Username` = '%e' LIMIT 0, 1", PlayerName[playerid]); // รหัสผ่านและ ID จากชื่อผู้เล่น
 	mysql_tquery(sql_handle, query, "Check_Account", "i", playerid);    
     return 1;
 }
