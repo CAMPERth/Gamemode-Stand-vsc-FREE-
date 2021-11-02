@@ -46,7 +46,6 @@ public OnPlayerSpawn(playerid)
 
 public OnPlayerDisconnect(playerid, reason)
 {
-	mysql_close(sql_handle);
 	SavePlayer(playerid); // เซฟข้อมูล
 	return 1;
 }
