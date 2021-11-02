@@ -35,7 +35,15 @@ public OnPlayerConnect(playerid)
 	Checkid_Account(playerid);
 	return 1;
 }
- 
+
+public OnPlayerSpawn(playerid)
+{
+	// เปลี่ยนจุดเกิดตรงนี้
+	SetPlayerPos(playerid, 1958.3783, 1343.1572, 15.3746);
+	SetPlayerFacingAngle(playerid, 269.1425);
+	return 1;
+}
+
 public OnPlayerDisconnect(playerid, reason)
 {
 	mysql_close(sql_handle);
