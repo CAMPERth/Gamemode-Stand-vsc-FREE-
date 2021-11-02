@@ -6,3 +6,5 @@ main()
 	print("By CAMPERth");
 	print("----------------------------------\n");
 }
+
+new test;
