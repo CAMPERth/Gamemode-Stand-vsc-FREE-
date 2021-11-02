@@ -29,6 +29,11 @@ public OnGameModeInit()
 	SetGameModeText("SERVER VERSION");
 	return 1;
 }
+public OnGameModeExit()
+{
+    mysql_close(sql_handle);
+	return 1;
+}
  
 public OnPlayerConnect(playerid)
 {
