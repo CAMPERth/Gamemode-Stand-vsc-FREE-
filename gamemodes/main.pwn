@@ -1,3 +1,11 @@
+/* 
+   สคริปต์ตัวนี้ถูกพัฒนาและดัดแปลงอีกทีจาก  https://pastebin.com/ETNALFd6 
+
+   CAMPERth (2021) MYSQL R41-4 Login/Register/ Basic
+
+*/ 
+
+
 #include <a_samp>
 
 #include <a_mysql>
@@ -42,7 +50,7 @@ Dialog:DIALOG_LOGIN(playerid, response, listitem, inputtext[])
  
 	new password[129], query[100];
 	WP_Hash(password, 129, inputtext); // แฮชรหัสผ่านที่ผู้เล่นเขียนในช่องโต้ตอบการเข้าสู่ระบบ
-	if(!strcmp(password, PlayerData[playerid][Password])) // ตรวจสอบว่ารหัสผ่านที่เราใช้ในการลงทะเบียนกับการแข่งขัน
+	if(!strcmp(password, PlayerData[playerid][user_password])) // ตรวจสอบว่ารหัสผ่านที่เราใช้ในการลงทะเบียนกับการแข่งขัน
 	{ // ถ้ามันตรงกัน
 		mysql_format(sql_handle, query, sizeof(query), "SELECT * FROM `users` WHERE `Username` = '%e' LIMIT 0, 1", PlayerName[playerid]);
 		mysql_tquery(sql_handle, query, "LoadPlayer", "i", playerid); //เรียก LoadPlayer 
@@ -63,8 +71,8 @@ Dialog:DIALOG_REGISTER(playerid, response, listitem, inputtext[])
 	if(strlen(inputtext) < 3) return Dialog_Show(playerid, DIALOG_REGISTER, DIALOG_STYLE_PASSWORD, "ลงทะเบียน", "{FF0000}รหัสผ่านสั้น!\n{FFFFFF}พิมพ์รหัสผ่าน 3 ตัวขึ้นไปหากคุณต้องการลงทะเบียนและเล่นบนเซิร์ฟเวอร์นี้", "ลงทะเบียน", "ออก");
 	// หากรหัสผ่านมีอักขระน้อยกว่า 3 ตัว ให้แสดงกล่องโต้ตอบที่บอกให้ป้อนรหัสผ่าน 3 ตัวขึ้นไป
 	new query[300];
-	WP_Hash(PlayerData[playerid][Password], 129, inputtext); // แฮชรหัสผ่านที่ผู้เล่นเขียนลงในกล่องโต้ตอบการลงทะเบียนโดยใช้ Whirlpool
-	mysql_format(sql_handle, query, sizeof(query), "INSERT INTO `users` (`Username`, `Password`, `IP`, `Cash`, `Kills`, `Deaths`) VALUES ('%e', '%e', '%e', 0, 0, 0)", PlayerName[playerid], PlayerData[playerid][Password], PlayerIP[playerid]);
+	WP_Hash(PlayerData[playerid][user_password], 129, inputtext); // แฮชรหัสผ่านที่ผู้เล่นเขียนลงในกล่องโต้ตอบการลงทะเบียนโดยใช้ Whirlpool
+	mysql_format(sql_handle, query, sizeof(query), "INSERT INTO `users` (`Username`, `Password`, `IP`) VALUES ('%e', '%e', '%e')", PlayerName[playerid], PlayerData[playerid][user_password], PlayerIP[playerid]);
 	// แทรกข้อมูลผู้เล่นลงในฐานข้อมูล MySQL เพื่อให้เราสามารถโหลดได้ในภายหลัง
 	mysql_pquery(sql_handle, query, "RegisterPlayer", "i", playerid); // เรียกสิ่งนี้ทันทีที่ผู้เล่นลงทะเบียนสำเร็จ
 	return 1;
@@ -78,8 +86,8 @@ public Check_Account(playerid)
  
 	if(rows) // If row exists 
 	{
-		cache_get_value_name(0, "Password", PlayerData[playerid][Password], 129); // โหลดรหัสผ่านของผู้เล่น
-		cache_get_value_name_int(0, "ID", PlayerData[playerid][ID]); // โหลด ID ผู้เล่น
+		cache_get_value_name(0, "Password", PlayerData[playerid][user_password], 129); // โหลดรหัสผ่านของผู้เล่น
+		cache_get_value_name_int(0, "ID", PlayerData[playerid][user_id]); // โหลด ID ผู้เล่น
 		format(string, sizeof(string), "ยินดีต้อนรับกลับสู่เซิร์ฟเวอร์\nโปรดพิมพ์รหัสผ่านของคุณด้านล่างเพื่อเข้าสู่ระบบบัญชีของคุณ"); // กล่องโต้ตอบจะปรากฏขึ้นเพื่อบอกให้ผู้เล่นเขียนรหัสผ่านด้านล่างเพื่อเข้าสู่ระบบ
 		Dialog_Show(playerid, DIALOG_LOGIN, DIALOG_STYLE_PASSWORD, "Login", string, "Login", "Exit");
 	}
@@ -95,9 +103,7 @@ public Check_Account(playerid)
 forward LoadPlayer(playerid);
 public LoadPlayer(playerid)
 {
-	cache_get_value_name_int(0, "Cash", PlayerData[playerid][Cash]);
-	cache_get_value_name_int(0, "Kills", PlayerData[playerid][Kills]);
-	cache_get_value_name_int(0, "Deaths", PlayerData[playerid][Deaths]);
+	cache_get_value_name_int(0, "user_money", PlayerData[playerid][user_money]);
 	return 1;
 }
  
@@ -106,7 +112,7 @@ forward SavePlayer(playerid);
 public SavePlayer(playerid)
 {
 	new query[140];
-	mysql_format(sql_handle, query, sizeof(query), "UPDATE `users` SET `Cash` = '%d', `Kills` = '%d', `Deaths` = '%d' WHERE `ID` = '%d'", PlayerData[playerid][Cash], PlayerData[playerid][Kills], PlayerData[playerid][Deaths], PlayerData[playerid][ID]);
+	mysql_format(sql_handle, query, sizeof(query), "UPDATE `users` SET `user_money` = '%d' WHERE `ID` = '%d'", PlayerData[playerid][user_money], PlayerData[playerid][user_id]);
 	mysql_tquery(sql_handle, query);
 	return 1;
 }
@@ -115,7 +121,11 @@ public SavePlayer(playerid)
 forward RegisterPlayer(playerid);
 public RegisterPlayer(playerid)
 {
-	PlayerData[playerid][ID] = cache_insert_id();
-	printf("> playerid %d has been registered!", PlayerData[playerid][ID]);
+	new string[150];
+	format(string, sizeof(string), "ยินดีต้อนรับกลับสู่เซิร์ฟเวอร์\nโปรดพิมพ์รหัสผ่านของคุณด้านล่างเพื่อเข้าสู่ระบบบัญชีของคุณ"); // กล่องโต้ตอบจะปรากฏขึ้นเพื่อบอกให้ผู้เล่นเขียนรหัสผ่านด้านล่างเพื่อเข้าสู่ระบบ
+	Dialog_Show(playerid, DIALOG_LOGIN, DIALOG_STYLE_PASSWORD, "Login", string, "Login", "Exit");	
+
+	PlayerData[playerid][user_id] = cache_insert_id();
+	printf("> playerid %d has been registered!", PlayerData[playerid][user_id]);
 	return 1;
 }
