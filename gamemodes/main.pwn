@@ -31,7 +31,7 @@ public OnGameModeInit()
 }
 public OnGameModeExit()
 {
-    mysql_close(sql_handle);
+    //mysql_close(sql_handle);
 	return 1;
 }
  
