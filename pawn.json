@@ -1,0 +1,10 @@
+{
+	"user": "CAMPERth",
+	"repo": "stand-vsc",
+	"entry": "gamemodes\\main.pwn",
+	"output": "gamemodes\\main.amx",
+	"dependencies": [
+		"sampctl/samp-stdlib"
+	],
+	"local": true
+}
